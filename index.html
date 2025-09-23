@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Team - إدارة المخزون</title>
+    <!-- Use Tailwind CSS for a modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'jo-blue': '#00478C',
+                        'jo-light-blue': '#00AEEF',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Use Cairo and Inter fonts from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Load required libraries for Excel processing and file saving -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+        /* Custom styles to integrate with Tailwind and enhance typography */
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            @apply bg-slate-50 text-slate-800;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid theme('colors.jo-light-blue');
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .file-input {
+            @apply block w-full text-sm text-gray-500 rounded-lg border border-gray-300 py-2 px-4 focus:ring-2 focus:ring-jo-light-blue focus:border-jo-light-blue transition-colors duration-300;
+        }
+
+        .file-input::file-selector-button {
+            @apply mr-4 py-2 px-4 rounded-full border-0 text-sm font-semibold bg-jo-light-blue/20 text-jo-blue hover:bg-jo-light-blue/40 transition-colors duration-300;
+        }
+
+        .logo-container {
+            /* Using a placeholder image that matches the logo colors */
+            background-image: url('https://placehold.co/40x40/00478C/ffffff/00AEEF?text=JO');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right center;
+            padding-right: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-jo-blue logo-container">Inventory Team</div>
+            <div class="hidden md:flex gap-6">
+                <a href="#duplicates" class="text-gray-600 hover:text-jo-blue font-semibold transition-colors duration-300">كشف التكرارات</a>
+                <a href="#future" class="text-gray-600 hover:text-jo-blue font-semibold transition-colors duration-300">التقارير</a>
+            </div>
+            <!-- Mobile Menu Placeholder -->
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Hero Section -->
+        <section class="text-center py-16 bg-gradient-to-br from-white via-slate-50 to-jo-light-blue/10 rounded-2xl shadow-md mb-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-jo-blue mb-4 animate-fade-in-up">
+                إدارة المخزون وكشف التكرارات
+            </h1>
+            <p class="text-lg text-gray-600 animate-fade-in-up">
+                ارفع ملفات Excel الخاصة بك واكتشف التكرارات بسهولة وسرعة
+            </p>
+        </section>
+
+        <!-- Duplicate Finder Section (Card) -->
+        <section class="bg-white rounded-2xl shadow-xl p-8 mb-8" id="duplicates">
+            <h2 class="text-3xl font-bold text-jo-blue mb-6">كشف التكرارات</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="file1" class="block text-gray-700 font-medium mb-2">الملف الأول</label>
+                    <input type="file" id="file1" accept=".xlsx,.xls" class="file-input" />
+                </div>
+                <div>
+                    <label for="file2" class="block text-gray-700 font-medium mb-2">الملف الثاني</label>
+                    <input type="file" id="file2" accept=".xlsx,.xls" class="file-input" />
+                </div>
+            </div>
+            <button onclick="processFiles()" class="w-full mt-8 bg-gradient-to-r from-jo-blue to-jo-light-blue text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                معالجة الملفات
+            </button>
+            <div id="status" class="mt-6 p-4 rounded-lg text-center font-medium hidden"></div>
+        </section>
+
+        <!-- Future Section (Card) -->
+        <section class="bg-white rounded-2xl shadow-xl p-8 mb-8" id="future">
+            <h2 class="text-3xl font-bold text-jo-blue mb-6">التقارير والإحصائيات</h2>
+            <p class="text-gray-600 text-lg">
+                سيتم إضافة مزيد من الميزات هنا قريباً، مثل ملخصات المخزون والرسوم البيانية والتقارير المتقدمة.
+            </p>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>Made with ❤️ by the Automation Team, led by Yazan Hijazi.</p>
+        </div>
+    </footer>
+
+    <script>
+        function normalizeJordanianPhone(phone) {
+            if (!phone) return null;
+            phone = phone.toString().replace(/[^0-9+]/g, "");
+            if (phone.startsWith("00")) phone = "+" + phone.slice(2);
+            if (phone.startsWith("962") && !phone.startsWith("+")) phone = "+" + phone;
+            if (phone.startsWith("07")) phone = "+962" + phone.slice(1);
+            if (phone.startsWith("7")) phone = "+962" + phone;
+            if (!phone.startsWith("+962")) return null;
+            return phone.slice(0, 13);
+        }
+
+        function readExcel(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+                        resolve(jsonData);
+                    } catch (err) {
+                        reject(new Error("حدث خطأ في قراءة ملف Excel. يرجى التأكد من أن التنسيق صحيح."));
+                    }
+                };
+                reader.onerror = () => reject(new Error("حدث خطأ في قراءة الملف."));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function showMessage(type, message) {
+            const statusEl = document.getElementById("status");
+            statusEl.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
+            statusEl.classList.add('flex', 'items-center', 'justify-center', 'space-x-2');
+
+            let icon = '';
+            if (type === 'success') {
+                icon = '✅';
+                statusEl.classList.add('bg-green-100', 'text-green-700');
+            } else if (type === 'error') {
+                icon = '❌';
+                statusEl.classList.add('bg-red-100', 'text-red-700');
+            } else if (type === 'info') {
+                icon = '<span class="loader ml-3"></span>';
+                statusEl.classList.add('bg-jo-light-blue/20', 'text-jo-blue');
+            }
+
+            statusEl.innerHTML = `${icon} <span class="text-sm md:text-base">${message}</span>`;
+        }
+
+        function processFiles() {
+            const f1 = document.getElementById("file1").files[0];
+            const f2 = document.getElementById("file2").files[0];
+
+            if (!f1 || !f2) {
+                showMessage('error', 'الرجاء اختيار كلا الملفين.');
+                return;
+            }
+
+            showMessage('info', 'جاري المعالجة...');
+
+            Promise.all([readExcel(f1), readExcel(f2)])
+                .then(dfs => {
+                    let df1 = dfs[0],
+                        df2 = dfs[1],
+                        df = df1.concat(df2);
+
+                    df.forEach(r => r["PhoneNumSMS_Normalized"] = normalizeJordanianPhone(r["PhoneNumSMS"]));
+
+                    let orderIDs = {};
+                    df.forEach(r => {
+                        let id = r["Order ID"];
+                        if (id && id !== 0 && id.toString().trim() !== "") {
+                            if (!orderIDs[id]) orderIDs[id] = [];
+                            orderIDs[id].push(r);
+                        }
+                    });
+
+                    let ordersResult = [];
+                    Object.keys(orderIDs).forEach(id => {
+                        if (orderIDs[id].length > 1) {
+                            let header = {};
+                            Object.keys(df[0]).forEach(k => header[k] = "");
+                            header["Order ID"] = `==== ORDER ID: ${id} ====`;
+                            ordersResult.push(header);
+                            ordersResult = ordersResult.concat(orderIDs[id]);
+                        }
+                    });
+
+                    let phones = {};
+                    df.forEach(r => {
+                        let phone = r["PhoneNumSMS_Normalized"];
+                        if (phone) {
+                            if (!phones[phone]) phones[phone] = [];
+                            phones[phone].push(r);
+                        }
+                    });
+
+                    let phonesResult = [];
+                    Object.keys(phones).forEach(phone => {
+                        if (phones[phone].length > 1) {
+                            let header = {};
+                            Object.keys(df[0]).forEach(k => header[k] = "");
+                            header["PhoneNumSMS_Normalized"] = `==== PHONE: ${phone} ====`;
+                            phonesResult.push(header);
+                            phonesResult = phonesResult.concat(phones[phone]);
+                        }
+                    });
+
+                    const wb = XLSX.utils.book_new();
+                    const ws1 = XLSX.utils.json_to_sheet(ordersResult);
+                    const ws2 = XLSX.utils.json_to_sheet(phonesResult);
+                    XLSX.utils.book_append_sheet(wb, ws1, "Duplicates_By_OrderID");
+                    XLSX.utils.book_append_sheet(wb, ws2, "Duplicates_By_Phone");
+
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "duplicates_grouped_clean.xlsx");
+
+                    showMessage('success', 'تمت المعالجة بنجاح! الملف جاهز للتحميل.');
+                })
+                .catch(err => {
+                    console.error(err);
+                    showMessage('error', 'حدث خطأ أثناء المعالجة: ' + err.message);
+                });
+        }
+    </script>
+
+</body>
+
+</html>

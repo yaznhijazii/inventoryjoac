@@ -12,22 +12,22 @@
                 extend: {
                     colors: {
                         // ألوان JO Academy الأساسية (للتدرجات والأيقونات)
-                        'jo-blue': '#00478C',
+                        'jo-blue': '#00478C', // تم استخدامه الآن لنص الفوتر
                         'jo-light-blue': '#00AEEF',
-                        'jo-dark-blue': '#003366', 
+                        'jo-dark-blue': '#003366',
                         'jo-vibrant-blue': '#005a9c',
-                        'jo-grey': '#f9fafb', 
-                        
+                        'jo-grey': '#f9fafb',
+
                         // 🌟🌟🌟 الألوان المحدثة بناءً على طلبك 🌟🌟🌟
                         'header-bg': '#1a428a', // لون خلفية الهيدر الجديد
-                        'footer-text': '#f2a057', // لون نص الفوتر الجديد
+                        // ❌ تم حذف 'footer-text' من هنا واستخدام 'jo-blue' مباشرة
                         // 🌟🌟🌟 نهاية الألوان المحدثة 🌟🌟🌟
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <style>
@@ -35,8 +35,7 @@
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
             @apply bg-jo-grey text-slate-800;
-            /* زيادة المسافة العلوية ليتناسب مع الهيدر الجديد */
-            padding-top: 80px; 
+            padding-top: 80px;
         }
 
         /* Loading Spinner */
@@ -57,13 +56,33 @@
                 transform: rotate(360deg);
             }
         }
-        
+
         /* تأثير النبض البسيط (لزر التحليل) */
         @keyframes pulse-once {
             0% { transform: scale(1); box-shadow: 0 10px 15px -3px rgba(26, 66, 138, 0.4), 0 4px 6px -2px rgba(26, 66, 138, 0.4); }
             50% { transform: scale(1.02); box-shadow: 0 20px 25px -5px rgba(26, 66, 138, 0.8), 0 10px 10px -5px rgba(26, 66, 138, 0.7); }
             100% { transform: scale(1); box-shadow: 0 10px 15px -3px rgba(26, 66, 138, 0.4), 0 4px 6px -2px rgba(26, 66, 138, 0.4); }
         }
+
+        /* 🌟🌟🌟 التأثير الحركي الجديد (Slide In Up) 🌟🌟🌟 */
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px); /* يبدأ من 30 بكسل تحت مكانه */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-animation {
+            /* يتم تعيين مدة التأثير هنا، وتطبيق التأخير سيتم مباشرة في الـ HTML */
+            animation: slideInUp 1s ease-out forwards;
+            opacity: 0; /* مخفي في البداية ليعمل التأثير بشكل صحيح */
+        }
+        /* 🌟🌟🌟 نهاية التأثير الحركي 🌟🌟🌟 */
+
 
         /* Input File Custom Style for Sleek Look */
         .file-input {
@@ -83,20 +102,19 @@
             content: '📦';
             @apply ml-3 text-jo-light-blue text-4xl transition-all duration-300;
         }
-        
+
         .ui-card {
-            @apply bg-white rounded-2xl p-8 lg:p-10 shadow-xl border-t-4 border-jo-light-blue transition-all duration-300 hover:shadow-2xl hover:scale-[1.01];
+            @apply bg-white rounded-2xl p-8 lg:p-10 shadow-xl border-t-4 border-jo-light-blue transition-all duration-300 hover:shadow-2xl hover:scale-[1.005];
         }
 
         /* تصميم الزر الرئيسي */
         .main-button {
-            /* تعديل التدرج ليتناسب مع لون الهيدر الجديد */
-            @apply w-full mt-10 bg-gradient-to-r from-jo-dark-blue to-jo-vibrant-blue text-white font-extrabold py-5 px-6 rounded-xl text-xl 
-                   shadow-2xl shadow-header-bg/70 /* استخدام لون الهيدر لظل الزر */
-                   transition-all duration-300 transform 
+            @apply w-full mt-10 bg-gradient-to-r from-jo-dark-blue to-jo-vibrant-blue text-white font-extrabold py-5 px-6 rounded-xl text-xl
+                   shadow-2xl shadow-header-bg/70
+                   transition-all duration-300 transform
                    hover:scale-[1.01] hover:shadow-header-bg/80
                    active:scale-[0.99] active:shadow-none;
-            animation: pulse-once 1.5s ease-in-out 1; 
+            animation: pulse-once 1.5s ease-in-out 1;
         }
 
         /* كلاسات التحكم في الـ Navbar */
@@ -120,10 +138,10 @@
     <div class="container mx-auto px-4 py-4">
 
         <section id="hero-section" class="text-center py-16 rounded-3xl mb-12 bg-white shadow-xl">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-jo-blue mb-4 leading-tight">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-jo-blue mb-4 leading-tight hero-animation" style="animation-delay: 0.2s;">
                 أدوات فريق المستودعات
             </h1>
-            <p class="text-xl text-gray-600 font-medium mt-6">
+            <p class="text-xl text-gray-600 font-medium mt-6 hero-animation" style="animation-delay: 0.5s;">
                 تبسيط العمليات اليومية: دقة، سرعة، وكفاءة عالية لإدارة المخزون في <span class="text-jo-light-blue font-bold">JO Academy</span>.
             </p>
         </section>
@@ -133,7 +151,7 @@
                 <svg class="w-7 h-7 ml-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.39 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 كشف التكرارات الفورية (Duplicates Checker)
             </h2>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="p-4 bg-jo-grey rounded-lg border border-gray-200">
                     <label for="file1" class="block text-gray-700 font-semibold mb-2 text-base">الملف (A) - المصدر الأول</label>
@@ -144,12 +162,12 @@
                     <input type="file" id="file2" accept=".xlsx,.xls" class="file-input" />
                 </div>
             </div>
-            
+
             <button onclick="processFiles()" class="main-button flex items-center justify-center">
                 <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                 بدء عملية التحليل
             </button>
-            
+
             <div id="status" class="mt-8 p-4 rounded-lg text-center font-bold hidden"></div>
 
             <div id="resultsSummary" class="mt-8 p-6 bg-green-50 rounded-xl border border-green-300 shadow-md hidden">
@@ -173,8 +191,8 @@
             </div>
 
         </section>
-        
-        <div class="h-10"></div> 
+
+        <div class="h-10"></div>
 
         <section class="ui-card" id="future">
             <h2 class="text-3xl font-extrabold text-jo-blue mb-8 border-b pb-3 border-jo-blue/10 flex items-center">
@@ -199,8 +217,8 @@
 
     <footer class="bg-white py-6 mt-16 shadow-inner border-t-2 border-jo-light-blue/20">
         <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-            <p class="text-footer-text font-bold">Made with ❤️ by the Automation Team, led by Yazan Hijazi.</p>
-            <p class="mt-1 text-xs text-footer-text">فريق المستودعات JO Academy &copy; <script>document.write(new Date().getFullYear())</script></p>
+            <p class="text-jo-blue font-bold">Made with ❤️ by the Automation Team, led by Yazan Hijazi.</p>
+            <p class="mt-1 text-xs text-jo-blue/80">فريق المستودعات JO Academy &copy; <script>document.write(new Date().getFullYear())</script></p>
         </div>
     </footer>
 
@@ -214,7 +232,7 @@
             if (phone.startsWith("962") && !phone.startsWith("+")) phone = "+" + phone;
             if (phone.startsWith("07") && phone.length === 10) phone = "+962" + phone.slice(1);
             if (phone.startsWith("7") && phone.length === 9) phone = "+962" + phone;
-            
+
             if (!phone.startsWith("+962")) return null;
             return phone.slice(0, 13);
         }
@@ -243,8 +261,8 @@
         function showMessage(type, message) {
             const statusEl = document.getElementById("status");
             const summaryEl = document.getElementById("resultsSummary");
-            
-            summaryEl.classList.add('hidden'); 
+
+            summaryEl.classList.add('hidden');
 
             statusEl.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700', 'bg-jo-light-blue/20', 'text-jo-blue', 'bg-yellow-100', 'text-yellow-700');
             statusEl.classList.add('flex', 'items-center', 'justify-center', 'space-x-3');
@@ -262,7 +280,7 @@
                 icon = '<span class="loader ml-3"></span>';
                 classes = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
             }
-            
+
             statusEl.className = `mt-8 p-4 rounded-lg text-center font-bold flex items-center justify-center space-x-3 ${classes}`;
             statusEl.innerHTML = `${icon} <span class="text-base md:text-lg font-bold">${message}</span>`;
         }
@@ -278,7 +296,7 @@
             }
 
             showMessage('info', 'جاري المعالجة... يرجى الانتظار، قد تستغرق العملية بضع ثوانٍ.');
-            
+
             try {
                 const dfs = await Promise.all([readExcel(f1), readExcel(f2)]);
                 let df = dfs[0].concat(dfs[1]);
@@ -293,7 +311,7 @@
                 df.forEach(r => {
                     let id = r["Order ID"];
                     if (id && id !== 0 && id.toString().trim() !== "") {
-                        id = id.toString().trim(); 
+                        id = id.toString().trim();
                         if (!orderIDs[id]) orderIDs[id] = [];
                         orderIDs[id].push(r);
                     }
@@ -333,9 +351,9 @@
                         phonesResult = phonesResult.concat(phones[phone]);
                     }
                 });
-                
+
                 const wb = XLSX.utils.book_new();
-                
+
                 if (ordersResult.length > 0) {
                     const ws1 = XLSX.utils.json_to_sheet(ordersResult);
                     XLSX.utils.book_append_sheet(wb, ws1, "Duplicates_By_OrderID");
@@ -367,14 +385,14 @@
             }
         }
 
-        // كود تأثير الـ Shrinking Header الفعال (تم تعديله قليلاً ليتناسب مع الخلفية الداكنة)
+        // كود تأثير الـ Shrinking Header الفعال
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('main-navbar');
             const logo = navbar.querySelector('.logo-container');
             const navLinks = navbar.querySelectorAll('a');
-            
+
             function handleScroll() {
-                const scrollThreshold = 100; 
+                const scrollThreshold = 100;
 
                 if (window.scrollY > scrollThreshold) {
                     // تصغير الهيدر وإضافة ظل أقوى عند التمرير
@@ -385,12 +403,12 @@
                     navbar.classList.add('py-4', 'shadow-md');
                     navbar.classList.remove('py-3', 'shadow-2xl');
                 }
-                
+
                 // للحفاظ على الألوان ثابتة (أبيض على الأزرق الداكن)
                 logo.classList.add('text-white');
                 navLinks.forEach(a => a.classList.add('text-white', 'hover:text-jo-light-blue'));
             }
-            
+
             window.addEventListener('scroll', handleScroll);
             handleScroll(); // تشغيل الدالة عند التحميل للتأكد من الحالة الصحيحة
         });

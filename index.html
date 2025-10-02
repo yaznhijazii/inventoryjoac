@@ -2,418 +2,232 @@
 <html lang="ar" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فريق المستودعات - Inventory Team</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        // ألوان JO Academy الأساسية (للتدرجات والأيقونات)
-                        'jo-blue': '#00478C', // تم استخدامه الآن لنص الفوتر
-                        'jo-light-blue': '#00AEEF',
-                        'jo-dark-blue': '#003366',
-                        'jo-vibrant-blue': '#005a9c',
-                        'jo-grey': '#f9fafb',
-
-                        // 🌟🌟🌟 الألوان المحدثة بناءً على طلبك 🌟🌟🌟
-                        'header-bg': '#1a428a', // لون خلفية الهيدر الجديد
-                        // ❌ تم حذف 'footer-text' من هنا واستخدام 'jo-blue' مباشرة
-                        // 🌟🌟🌟 نهاية الألوان المحدثة 🌟🌟🌟
-                    }
-                }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فريق المستودعات - Inventory Team</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'jo-blue': '#00478C',
+                    'jo-light-blue': '#00AEEF',
+                    'jo-dark-blue': '#003366',
+                    'jo-vibrant-blue': '#005a9c',
+                    'jo-grey': '#f9fafb',
+                    'header-bg': '#1a428a',
+                },
             }
         }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-    <style>
-        /* Custom styles for a cleaner look */
-        body {
-            font-family: 'Cairo', 'Inter', sans-serif;
-            @apply bg-jo-grey text-slate-800;
-            padding-top: 80px;
-        }
-
-        /* Loading Spinner */
-        .loader {
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid theme('colors.jo-light-blue');
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* تأثير النبض البسيط (لزر التحليل) */
-        @keyframes pulse-once {
-            0% { transform: scale(1); box-shadow: 0 10px 15px -3px rgba(26, 66, 138, 0.4), 0 4px 6px -2px rgba(26, 66, 138, 0.4); }
-            50% { transform: scale(1.02); box-shadow: 0 20px 25px -5px rgba(26, 66, 138, 0.8), 0 10px 10px -5px rgba(26, 66, 138, 0.7); }
-            100% { transform: scale(1); box-shadow: 0 10px 15px -3px rgba(26, 66, 138, 0.4), 0 4px 6px -2px rgba(26, 66, 138, 0.4); }
-        }
-
-        /* 🌟🌟🌟 التأثير الحركي الجديد (Slide In Up) 🌟🌟🌟 */
-        @keyframes slideInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(30px); /* يبدأ من 30 بكسل تحت مكانه */
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero-animation {
-            /* يتم تعيين مدة التأثير هنا، وتطبيق التأخير سيتم مباشرة في الـ HTML */
-            animation: slideInUp 1s ease-out forwards;
-            opacity: 0; /* مخفي في البداية ليعمل التأثير بشكل صحيح */
-        }
-        /* 🌟🌟🌟 نهاية التأثير الحركي 🌟🌟🌟 */
-
-
-        /* Input File Custom Style for Sleek Look */
-        .file-input {
-            @apply block w-full text-sm text-gray-700 rounded-lg border border-gray-300 py-3 px-4 focus:ring-4 focus:ring-jo-light-blue/50 focus:border-jo-light-blue transition-all duration-300 bg-white shadow-inner;
-        }
-
-        .file-input::file-selector-button {
-            @apply ml-4 py-2 px-5 rounded-md border-0 text-sm font-bold bg-jo-blue/10 text-jo-blue hover:bg-jo-blue/20 transition-colors duration-300 cursor-pointer;
-        }
-
-        /* تعديل الألوان في اللوجو ليتناسب مع الخلفية الزرقاء الداكنة */
-        .logo-container {
-            font-family: 'Inter', sans-serif;
-            @apply text-3xl font-extrabold text-white tracking-wider flex items-center transition-all duration-300;
-        }
-        .logo-container::before {
-            content: '📦';
-            @apply ml-3 text-jo-light-blue text-4xl transition-all duration-300;
-        }
-
-        .ui-card {
-            @apply bg-white rounded-2xl p-8 lg:p-10 shadow-xl border-t-4 border-jo-light-blue transition-all duration-300 hover:shadow-2xl hover:scale-[1.005];
-        }
-
-        /* تصميم الزر الرئيسي */
-        .main-button {
-            @apply w-full mt-10 bg-gradient-to-r from-jo-dark-blue to-jo-vibrant-blue text-white font-extrabold py-5 px-6 rounded-xl text-xl
-                   shadow-2xl shadow-header-bg/70
-                   transition-all duration-300 transform
-                   hover:scale-[1.01] hover:shadow-header-bg/80
-                   active:scale-[0.99] active:shadow-none;
-            animation: pulse-once 1.5s ease-in-out 1;
-        }
-
-        /* كلاسات التحكم في الـ Navbar */
-        .navbar-transition {
-            transition: background-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
-        }
-    </style>
+    }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<style>
+body { font-family:'Cairo','Inter',sans-serif; background:#f9fafb; padding-top:90px; }
+.loader { border:4px solid #e5e7eb; border-top:4px solid #00aeef; border-radius:50%; width:24px; height:24px; animation:spin 1s linear infinite; margin-left:10px;}
+@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes pulse-once {0%{transform:scale(1);box-shadow:0 10px 15px -3 rgba(26,66,138,0.4),0 4px 6px -2 rgba(26,66,138,0.4);}50%{transform:scale(1.02);box-shadow:0 20px 25px -5 rgba(26,66,138,0.8),0 10px 10px -5 rgba(26,66,138,0.7);}100%{transform:scale(1);box-shadow:0 10px 15px -3 rgba(26,66,138,0.4),0 4px 6px -2 rgba(26,66,138,0.4);}}
+@keyframes slideInUp {0%{opacity:0;transform:translateY(30px);}100%{opacity:1;transform:translateY(0);}}
+.hero-animation {animation:slideInUp 1s ease-out forwards; opacity:0;}
+.file-input {display:block;width:100%;padding:12px 16px;font-size:14px;border:1px solid #ccc;border-radius:10px;background:white;transition:all 0.3s;}
+.file-input::file-selector-button {margin-left:8px;padding:8px 16px;border:0;background:#00478c10;color:#00478C;font-weight:bold;border-radius:6px;cursor:pointer;transition:all 0.3s;}
+.ui-card {background:white;border-radius:20px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.05);border-top:4px solid #00aeef;transition:all 0.3s;}
+.ui-card:hover {transform:scale(1.01);box-shadow:0 20px 25px rgba(0,0,0,0.1);}
+.main-button {width:100%;margin-top:20px;background:linear-gradient(to right,#003366,#005a9c);color:white;font-weight:800;padding:14px;border-radius:16px;font-size:18px;box-shadow:0 10px 20px rgba(0,0,0,0.2);transition:all 0.3s;display:flex;justify-content:center;align-items:center;animation:pulse-once 1.5s ease-in-out 1;}
+.main-button:hover {transform:scale(1.02);box-shadow:0 15px 25px rgba(0,0,0,0.25);}
+</style>
 </head>
 
 <body>
 
-    <nav id="main-navbar" class="fixed top-0 w-full z-50 navbar-transition bg-header-bg shadow-md py-4">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <div class="logo-container">Inventory Team</div>
-            <div class="hidden md:flex gap-8">
-                <a href="#duplicates" class="text-white hover:text-jo-light-blue font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-jo-light-blue pb-1">كشف التكرارات</a>
-                <a href="#future" class="text-white hover:text-jo-light-blue font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-jo-light-blue pb-1">أدوات إضافية</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container mx-auto px-4 py-4">
+<nav id="main-navbar" class="fixed top-0 w-full z-50 bg-header-bg shadow-md py-4 transition-all">
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <div class="text-3xl font-extrabold text-white flex items-center">
+      📦 <span class="ml-3">Inventory Team</span>
+    </div>
+    <div class="hidden md:flex gap-8">
+      <a href="#duplicates" class="text-white hover:text-jo-light-blue font-semibold transition-colors border-b-2 border-transparent hover:border-jo-light-blue pb-1">كشف التكرارات</a>
+      <a href="#future" class="text-white hover:text-jo-light-blue font-semibold transition-colors border-b-2 border-transparent hover:border-jo-light-blue pb-1">أدوات إضافية</a>
+    </div>
+  </div>
+</nav>
 
-        <section id="hero-section" class="text-center py-16 rounded-3xl mb-12 bg-white shadow-xl">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-jo-blue mb-4 leading-tight hero-animation" style="animation-delay: 0.2s;">
-                أدوات فريق المستودعات
-            </h1>
-            <p class="text-xl text-gray-600 font-medium mt-6 hero-animation" style="animation-delay: 0.5s;">
-                تبسيط العمليات اليومية: دقة، سرعة، وكفاءة عالية لإدارة المخزون في <span class="text-jo-light-blue font-bold">JO Academy</span>.
-            </p>
-        </section>
+<div class="container mx-auto px-4 py-8">
 
-        <section class="ui-card" id="duplicates">
-            <h2 class="text-3xl font-extrabold text-jo-blue mb-8 border-b pb-3 border-jo-blue/10 flex items-center">
-                <svg class="w-7 h-7 ml-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.39 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                كشف التكرارات الفورية (Duplicates Checker)
-            </h2>
+  <section id="hero-section" class="text-center py-16 rounded-3xl mb-12 bg-white shadow-xl">
+    <h1 class="text-5xl font-extrabold text-jo-blue mb-4 leading-tight hero-animation" style="animation-delay:0.2s;">أدوات فريق المستودعات</h1>
+    <p class="text-xl text-gray-600 font-medium hero-animation" style="animation-delay:0.5s;">تبسيط العمليات اليومية: دقة، سرعة، وكفاءة عالية لإدارة المخزون في <span class="text-jo-light-blue font-bold">JO Academy</span>.</p>
+  </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-4 bg-jo-grey rounded-lg border border-gray-200">
-                    <label for="file1" class="block text-gray-700 font-semibold mb-2 text-base">الملف (A) - المصدر الأول</label>
-                    <input type="file" id="file1" accept=".xlsx,.xls" class="file-input" />
-                </div>
-                <div class="p-4 bg-jo-grey rounded-lg border border-gray-200">
-                    <label for="file2" class="block text-gray-700 font-semibold mb-2 text-base">الملف (B) - للمقارنة</label>
-                    <input type="file" id="file2" accept=".xlsx,.xls" class="file-input" />
-                </div>
-            </div>
+  <section class="ui-card" id="duplicates">
+    <h2 class="text-3xl font-extrabold text-jo-blue mb-8 border-b pb-3 border-jo-blue/10 flex items-center">
+      كشف التكرارات الفورية
+    </h2>
 
-            <button onclick="processFiles()" class="main-button flex items-center justify-center">
-                <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                بدء عملية التحليل
-            </button>
-
-            <div id="status" class="mt-8 p-4 rounded-lg text-center font-bold hidden"></div>
-
-            <div id="resultsSummary" class="mt-8 p-6 bg-green-50 rounded-xl border border-green-300 shadow-md hidden">
-                <h3 class="text-xl font-extrabold text-green-700 mb-4 border-b border-green-200 pb-2 flex items-center">
-                    <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.047 12.007 12.007 0 00-1.76 13.097A11.983 11.983 0 0012 21a11.983 11.983 0 0010.378-5.912 12.007 12.007 0 00-1.76-13.097z"></path></svg>
-                    تمت المعالجة بنجاح
-                </h3>
-                <div class="grid grid-cols-2 gap-4 text-slate-700">
-                    <div class="flex flex-col items-start">
-                        <span class="font-extrabold text-3xl text-red-600" id="orderDupCount">0</span>
-                        <span class="text-sm font-semibold">تكرارات رقم الطلب</span>
-                    </div>
-                    <div class="flex flex-col items-start">
-                        <span class="font-extrabold text-3xl text-orange-600" id="phoneDupCount">0</span>
-                        <span class="text-sm font-semibold">تكرارات رقم الهاتف</span>
-                    </div>
-                </div>
-                <p class="text-xs italic text-gray-500 mt-4 pt-3 border-t border-gray-200">
-                    يمكنك الآن تحميل ملف Excel المفصل للتكرارات.
-                </p>
-            </div>
-
-        </section>
-
-        <div class="h-10"></div>
-
-        <section class="ui-card" id="future">
-            <h2 class="text-3xl font-extrabold text-jo-blue mb-8 border-b pb-3 border-jo-blue/10 flex items-center">
-                <svg class="w-7 h-7 ml-3 text-jo-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                أدوات إضافية وإحصائيات (قريباً)
-            </h2>
-            <div class="p-6 bg-jo-grey rounded-lg border border-dashed border-gray-300">
-                <p class="text-gray-700 text-lg font-medium mb-4">
-                    هذا القسم مخصص للتوسع في مهام المستودعات.
-                </p>
-                <ul class="list-disc list-inside text-gray-600 space-y-2 mr-4 text-base font-normal">
-                    <li><span class="font-semibold">مقارنة فترات المخزون:</span> لتحديد الفرق بين جردين.</li>
-                    <li><span class="font-semibold">متابعة الحد الأدنى:</span> تنبيهات آلية عند وصول صنف معين للحد الأدنى.</li>
-                    <li><span class="font-semibold">تقارير أداء:</span> رسوم بيانية تفاعلية لأداء فريق المخزون.</li>
-                </ul>
-                <p class="text-sm italic text-jo-blue/80 mt-6">
-                    نحن نعمل على تجهيز الأدوات لرفع كفاءة عملياتك.
-                </p>
-            </div>
-        </section>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block mb-2 font-semibold text-gray-700">الملف (A) - المصدر الأول</label>
+        <input type="file" id="file1" accept=".xlsx,.xls" class="file-input">
+      </div>
+      <div>
+        <label class="block mb-2 font-semibold text-gray-700">الملف (B) - للمقارنة</label>
+        <input type="file" id="file2" accept=".xlsx,.xls" class="file-input">
+      </div>
     </div>
 
-    <footer class="bg-white py-6 mt-16 shadow-inner border-t-2 border-jo-light-blue/20">
-        <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-            <p class="text-jo-blue font-bold">Made with ❤️ by the Automation Team, led by Yazan Hijazi.</p>
-            <p class="mt-1 text-xs text-jo-blue/80">فريق المستودعات JO Academy &copy; <script>document.write(new Date().getFullYear())</script></p>
+    <button onclick="processFiles()" class="main-button mt-6">🔍 بدء عملية التحليل</button>
+
+    <div id="status" class="mt-6 p-4 rounded-lg text-center font-bold hidden"></div>
+
+    <div id="resultsSummary" class="mt-6 p-6 bg-green-50 rounded-xl border border-green-300 shadow-md hidden">
+      <h3 class="text-xl font-extrabold text-green-700 mb-4 border-b border-green-200 pb-2">✅ تمت المعالجة بنجاح</h3>
+      <div class="grid grid-cols-2 gap-4 text-slate-700">
+        <div class="flex flex-col items-start">
+          <span class="font-extrabold text-3xl text-red-600" id="orderDupCount">0</span>
+          <span class="text-sm font-semibold">تكرارات رقم الطلب</span>
         </div>
-    </footer>
+        <div class="flex flex-col items-start">
+          <span class="font-extrabold text-3xl text-orange-600" id="phoneDupCount">0</span>
+          <span class="text-sm font-semibold">تكرارات رقم الهاتف</span>
+        </div>
+      </div>
+      <p class="text-xs italic text-gray-500 mt-4 pt-3 border-t border-gray-200">يمكنك الآن تحميل ملف Excel المفصل للتكرارات.</p>
+    </div>
+  </section>
 
-    <script>
-        // دالة تطبيع رقم الهاتف (كما هي)
-        function normalizeJordanianPhone(phone) {
-            if (!phone) return null;
-            phone = phone.toString().replace(/[^0-9+]/g, "");
+  <section class="ui-card mt-12" id="future">
+    <h2 class="text-3xl font-extrabold text-jo-blue mb-4 border-b pb-3 border-jo-blue/10">أدوات إضافية</h2>
+    <p class="text-gray-700 mb-4">هذا القسم مخصص للتوسع في مهام المستودعات.</p>
+    <ul class="list-disc list-inside text-gray-600 space-y-2">
+      <li><span class="font-semibold">مقارنة فترات المخزون:</span> لتحديد الفرق بين جردين.</li>
+      <li><span class="font-semibold">متابعة الحد الأدنى:</span> تنبيهات آلية عند وصول صنف معين للحد الأدنى.</li>
+      <li><span class="font-semibold">تقارير أداء:</span> رسوم بيانية تفاعلية لأداء فريق المخزون.</li>
+    </ul>
+  </section>
 
-            if (phone.startsWith("00")) phone = "+" + phone.slice(2);
-            if (phone.startsWith("962") && !phone.startsWith("+")) phone = "+" + phone;
-            if (phone.startsWith("07") && phone.length === 10) phone = "+962" + phone.slice(1);
-            if (phone.startsWith("7") && phone.length === 9) phone = "+962" + phone;
+</div>
 
-            if (!phone.startsWith("+962")) return null;
-            return phone.slice(0, 13);
-        }
+<footer class="bg-white py-6 mt-16 shadow-inner border-t-2 border-jo-light-blue/20">
+  <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+    <p class="text-jo-blue font-bold">Made with ❤️ by the Automation Team, led by Yazan Hijazi.</p>
+    <p class="mt-1 text-xs text-jo-blue/80">فريق المستودعات JO Academy &copy; <script>document.write(new Date().getFullYear())</script></p>
+  </div>
+</footer>
 
-        // دالة قراءة ملف Excel (كما هي)
-        function readExcel(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array', cellDates: true, cellNF: false, cellText: false });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: "", raw: true });
-                        resolve(jsonData);
-                    } catch (err) {
-                        reject(new Error("حدث خطأ في قراءة ملف Excel. يرجى التأكد من أن التنسيق صحيح."));
-                    }
-                };
-                reader.onerror = () => reject(new Error("حدث خطأ في قراءة الملف."));
-                reader.readAsArrayBuffer(file);
-            });
-        }
+<script>
+// تطبيع رقم الهاتف
+function normalizeJordanianPhone(phone) {
+    if(!phone) return null;
+    phone = phone.toString().replace(/[^0-9+]/g,'');
+    if(phone.startsWith("00")) phone = "+"+phone.slice(2);
+    if(phone.startsWith("962") && !phone.startsWith("+")) phone = "+"+phone;
+    if(phone.startsWith("07") && phone.length===10) phone = "+962"+phone.slice(1);
+    if(phone.startsWith("7") && phone.length===9) phone = "+962"+phone;
+    if(!phone.startsWith("+962")) return null;
+    return phone.slice(0,13);
+}
 
-        // دالة عرض الرسائل والحالة (كما هي)
-        function showMessage(type, message) {
-            const statusEl = document.getElementById("status");
-            const summaryEl = document.getElementById("resultsSummary");
+// قراءة ملفات Excel
+function readExcel(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=e=>{
+            try{
+                const data=new Uint8Array(e.target.result);
+                const workbook=XLSX.read(data,{type:'array',cellDates:true});
+                const sheet=workbook.Sheets[workbook.SheetNames[0]];
+                const json=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:true});
+                resolve(json);
+            } catch(err){reject(err);}
+        };
+        reader.onerror=()=>reject(new Error("حدث خطأ في قراءة الملف."));
+        reader.readAsArrayBuffer(file);
+    });
+}
 
-            summaryEl.classList.add('hidden');
+// عرض الرسائل
+function showMessage(type,message){
+    const statusEl=document.getElementById("status");
+    statusEl.classList.remove('hidden','bg-red-100','text-red-700','bg-green-100','text-green-700','bg-yellow-100','text-yellow-700');
+    let classes=''; let icon='';
+    if(type==='success'){classes='bg-green-100 text-green-700 border border-green-300'; icon='✅';}
+    else if(type==='error'){classes='bg-red-100 text-red-700 border border-red-300'; icon='❌';}
+    else if(type==='info'){classes='bg-yellow-100 text-yellow-700 border border-yellow-300'; icon='<span class="loader"></span>';}
+    statusEl.className=`mt-6 p-4 rounded-lg text-center font-bold flex items-center justify-center ${classes}`;
+    statusEl.innerHTML=`${icon} <span>${message}</span>`;
+}
 
-            statusEl.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700', 'bg-jo-light-blue/20', 'text-jo-blue', 'bg-yellow-100', 'text-yellow-700');
-            statusEl.classList.add('flex', 'items-center', 'justify-center', 'space-x-3');
-
-            let icon = '';
-            let classes = '';
-
-            if (type === 'success') {
-                icon = '✅';
-                classes = 'bg-green-100 text-green-700 border border-green-300';
-            } else if (type === 'error') {
-                icon = '❌';
-                classes = 'bg-red-100 text-red-700 border border-red-300';
-            } else if (type === 'info') {
-                icon = '<span class="loader ml-3"></span>';
-                classes = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
-            }
-
-            statusEl.className = `mt-8 p-4 rounded-lg text-center font-bold flex items-center justify-center space-x-3 ${classes}`;
-            statusEl.innerHTML = `${icon} <span class="text-base md:text-lg font-bold">${message}</span>`;
-        }
-
-        // دالة المعالجة الرئيسية (كما هي)
-        async function processFiles() {
-            const f1 = document.getElementById("file1").files[0];
-            const f2 = document.getElementById("file2").files[0];
-
-            if (!f1 || !f2) {
-                showMessage('error', 'الرجاء اختيار كلا الملفين للمقارنة.');
-                return;
-            }
-
-            showMessage('info', 'جاري المعالجة... يرجى الانتظار، قد تستغرق العملية بضع ثوانٍ.');
-
-            try {
-                const dfs = await Promise.all([readExcel(f1), readExcel(f2)]);
-                let df = dfs[0].concat(dfs[1]);
-
-                if (!df.some(r => r.hasOwnProperty("PhoneNumSMS"))) {
-                    throw new Error("لم يتم العثور على عمود باسم 'PhoneNumSMS' في الملفات.");
-                }
-
-                df.forEach(r => r["PhoneNumSMS_Normalized"] = normalizeJordanianPhone(r["PhoneNumSMS"]));
-
-                let orderIDs = {};
-                df.forEach(r => {
-                    let id = r["Order ID"];
-                    if (id && id !== 0 && id.toString().trim() !== "") {
-                        id = id.toString().trim();
-                        if (!orderIDs[id]) orderIDs[id] = [];
-                        orderIDs[id].push(r);
-                    }
-                });
-
-                let ordersResult = [];
-                let orderDupCount = 0;
-                Object.keys(orderIDs).forEach(id => {
-                    if (orderIDs[id].length > 1) {
-                        orderDupCount++;
-                        let header = {};
-                        Object.keys(df[0]).forEach(k => header[k] = "");
-                        header["Order ID"] = `==== ORDER ID DUPLICATE: ${id} (${orderIDs[id].length} ENTRIES) ====`;
-                        ordersResult.push(header);
-                        ordersResult = ordersResult.concat(orderIDs[id]);
-                    }
-                });
-
-                let phones = {};
-                df.forEach(r => {
-                    let phone = r["PhoneNumSMS_Normalized"];
-                    if (phone) {
-                        if (!phones[phone]) phones[phone] = [];
-                        phones[phone].push(r);
-                    }
-                });
-
-                let phonesResult = [];
-                let phoneDupCount = 0;
-                Object.keys(phones).forEach(phone => {
-                    if (phones[phone].length > 1) {
-                        phoneDupCount++;
-                        let header = {};
-                        Object.keys(df[0]).forEach(k => header[k] = "");
-                        header["PhoneNumSMS_Normalized"] = `==== PHONE DUPLICATE: ${phone} (${phones[phone].length} ENTRIES) ====`;
-                        phonesResult.push(header);
-                        phonesResult = phonesResult.concat(phones[phone]);
-                    }
-                });
-
-                const wb = XLSX.utils.book_new();
-
-                if (ordersResult.length > 0) {
-                    const ws1 = XLSX.utils.json_to_sheet(ordersResult);
-                    XLSX.utils.book_append_sheet(wb, ws1, "Duplicates_By_OrderID");
-                } else {
-                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ "رسالة": "لا توجد تكرارات في أرقام الطلبات" }]), "Duplicates_By_OrderID");
-                }
-
-                if (phonesResult.length > 0) {
-                    const ws2 = XLSX.utils.json_to_sheet(phonesResult);
-                    XLSX.utils.book_append_sheet(wb, ws2, "Duplicates_By_Phone");
-                } else {
-                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ "رسالة": "لا توجد تكرارات في أرقام الهواتف" }]), "Duplicates_By_Phone");
-                }
-
-
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-                saveAs(new Blob([wbout], { type: "application/octet-stream" }), `JO_Inventory_Duplicates_Report_${dateString}.xlsx`);
-
-                document.getElementById("orderDupCount").innerText = orderDupCount;
-                document.getElementById("phoneDupCount").innerText = phoneDupCount;
-                document.getElementById("resultsSummary").classList.remove('hidden');
-
-                showMessage('success', `تمت المعالجة بنجاح! تم كشف ${orderDupCount} تكرار طلب و ${phoneDupCount} تكرار هاتف.`);
-
-            } catch (err) {
-                console.error(err);
-                showMessage('error', 'حدث خطأ أثناء المعالجة: ' + err.message);
-            }
-        }
-
-        // كود تأثير الـ Shrinking Header الفعال
-        document.addEventListener('DOMContentLoaded', () => {
-            const navbar = document.getElementById('main-navbar');
-            const logo = navbar.querySelector('.logo-container');
-            const navLinks = navbar.querySelectorAll('a');
-
-            function handleScroll() {
-                const scrollThreshold = 100;
-
-                if (window.scrollY > scrollThreshold) {
-                    // تصغير الهيدر وإضافة ظل أقوى عند التمرير
-                    navbar.classList.add('py-3', 'shadow-2xl');
-                    navbar.classList.remove('py-4', 'shadow-md');
-                } else {
-                    // تكبير الهيدر قليلاً عند العودة للأعلى
-                    navbar.classList.add('py-4', 'shadow-md');
-                    navbar.classList.remove('py-3', 'shadow-2xl');
-                }
-
-                // للحفاظ على الألوان ثابتة (أبيض على الأزرق الداكن)
-                logo.classList.add('text-white');
-                navLinks.forEach(a => a.classList.add('text-white', 'hover:text-jo-light-blue'));
-            }
-
-            window.addEventListener('scroll', handleScroll);
-            handleScroll(); // تشغيل الدالة عند التحميل للتأكد من الحالة الصحيحة
+// المعالجة الرئيسية
+async function processFiles(){
+    const f1=document.getElementById("file1").files[0];
+    const f2=document.getElementById("file2").files[0];
+    if(!f1||!f2){showMessage('error','الرجاء اختيار كلا الملفين للمقارنة.'); return;}
+    showMessage('info','جاري المعالجة...');
+    try{
+        const dfs=await Promise.all([readExcel(f1),readExcel(f2)]);
+        let df=dfs[0].concat(dfs[1]);
+        df.forEach(r=>r.PhoneNumSMS_Normalized=normalizeJordanianPhone(r.PhoneNumSMS));
+        let orderIDs={};
+        df.forEach(r=>{
+            const id=r["Order ID"]; if(!id) return;
+            if(!orderIDs[id]) orderIDs[id]=[];
+            orderIDs[id].push(r);
         });
-    </script>
+        let ordersResult=[]; let orderDupCount=0;
+        Object.keys(orderIDs).forEach(id=>{
+            const records=orderIDs[id];
+            if(records.length<=1) return;
+            const allSuccess=records.every(r=>r.Stage && r.Stage.toString().toLowerCase()==='success');
+            if(allSuccess) return; // تجاهل لو كلهم Success
+            orderDupCount++;
+            let header={}; Object.keys(df[0]).forEach(k=>header[k]="");
+            header["Order ID"]=`==== ORDER ID DUPLICATE: ${id} (${records.length} ENTRIES) ====`;
+            ordersResult.push(header); ordersResult=ordersResult.concat(records);
+        });
+
+        // الهواتف
+        let phones={};
+        df.forEach(r=>{
+            const phone=r.PhoneNumSMS_Normalized;
+            if(!phone) return;
+            if(!phones[phone]) phones[phone]=[];
+            phones[phone].push(r);
+        });
+        let phonesResult=[]; let phoneDupCount=0;
+        Object.keys(phones).forEach(phone=>{
+            if(phones[phone].length>1){phoneDupCount++; let header={}; Object.keys(df[0]).forEach(k=>header[k]=""); header["PhoneNumSMS_Normalized"]=`==== PHONE DUPLICATE: ${phone} (${phones[phone].length} ENTRIES) ====`; phonesResult.push(header); phonesResult=phonesResult.concat(phones[phone]);}
+        });
+
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(ordersResult.length>0?ordersResult:[{"رسالة":"لا توجد تكرارات في أرقام الطلبات"}]),"Duplicates_By_OrderID");
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(phonesResult.length>0?phonesResult:[{"رسالة":"لا توجد تكرارات في أرقام الهواتف"}]),"Duplicates_By_Phone");
+        const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+        saveAs(new Blob([wbout],{type:"application/octet-stream"}),`JO_Inventory_Duplicates_Report_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.xlsx`);
+
+        document.getElementById("orderDupCount").innerText=orderDupCount;
+        document.getElementById("phoneDupCount").innerText=phoneDupCount;
+        document.getElementById("resultsSummary").classList.remove('hidden');
+        showMessage('success',`تمت المعالجة بنجاح! تم كشف ${orderDupCount} تكرار طلب و ${phoneDupCount} تكرار هاتف.`);
+
+    } catch(err){console.error(err); showMessage('error','حدث خطأ أثناء المعالجة: '+err.message);}
+}
+
+// Shrinking header effect
+document.addEventListener('DOMContentLoaded',()=>{
+    const navbar=document.getElementById('main-navbar');
+    const links=navbar.querySelectorAll('a');
+    function handleScroll(){
+        if(window.scrollY>100){navbar.classList.add('py-3','shadow-2xl'); navbar.classList.remove('py-4','shadow-md');}
+        else{navbar.classList.add('py-4','shadow-md'); navbar.classList.remove('py-3','shadow-2xl');}
+        links.forEach(a=>a.classList.add('text-white','hover:text-jo-light-blue'));
+    }
+    window.addEventListener('scroll',handleScroll);
+    handleScroll();
+});
+</script>
 
 </body>
-
 </html>
